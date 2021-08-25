@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maxfit/domain/workout.dart';
+import 'package:maxfit/pages/auth.dart';
 import 'package:maxfit/pages/home.dart';
 
 void main() {
@@ -20,7 +21,7 @@ class MaxFitApp extends StatelessWidget {
           title: TextStyle(color: Colors.white),
         ),
       ),
-      home: HomePage(),
+      home: AuthorizationPage(),
     );
   }
 }
