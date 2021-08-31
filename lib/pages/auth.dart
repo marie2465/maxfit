@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:maxfit/domain/person.dart';
+import 'package:maxfit/services/auth.dart';
 
 class AuthorizationPage extends StatefulWidget {
   const AuthorizationPage({Key? key}) : super(key: key);
@@ -14,6 +18,8 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
   late String _email;
   late String _password;
   bool showLogin = true;
+
+  AuthServices _authService = AuthServices();
 
   Widget _logo() {
     return Padding(
@@ -42,9 +48,9 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
         obscureText: obscure,
         style: TextStyle(fontSize: 20.0, color: Colors.white),
         decoration: InputDecoration(
+          hintText: hint,
           hintStyle: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white30),
-          hintText: hint,
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white, width: 3),
           ),
@@ -122,12 +128,52 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
     );
   }
 
-  void _buttonAction() {
+  void _loginbuttonAction() async {
     _email = _emailcontroller.text;
     _password = _passwordcontroller.text;
 
-    _emailcontroller.clear();
-    _passwordcontroller.clear();
+    if (_email.isEmpty || _password.isEmpty) return;
+
+    Person? person = await _authService.signInWithEmailAndPassword(
+        _email.trim(), _password.trim());
+    if (person == null) {
+      Fluttertoast.showToast(
+        msg: "Can't SignIn you. Please check your email/password",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      _emailcontroller.clear();
+      _passwordcontroller.clear();
+    }
+  }
+
+  void _registerbuttonAction() async {
+    _email = _emailcontroller.text;
+    _password = _passwordcontroller.text;
+
+    if (_email.isEmpty || _password.isEmpty) return;
+
+    Person? person = await _authService.registerWithEmailAndPassword(
+        _email.trim(), _password.trim());
+    if (person == null) {
+      Fluttertoast.showToast(
+        msg: "Can't Register you. Please check your email/password",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      _emailcontroller.clear();
+      _passwordcontroller.clear();
+    }
   }
 
   Widget _bottomWave() {
@@ -149,51 +195,55 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Column(
-        children: <Widget>[
-          _logo(),
-          SizedBox(height: 120,),
-          (showLogin
-              ? Column(
-                  children: [
-                    _form('LOGIN', _buttonAction),
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: GestureDetector(
-                        child: Text(
-                          'Not registered yet? register!',
-                          style: TextStyle(fontSize: 20, color: Colors.white),
+      body: Scrollbar(
+        child: Column(
+          children: <Widget>[
+            _logo(),
+            SizedBox(
+              height: 120,
+            ),
+            (showLogin
+                ? Column(
+                    children: [
+                      _form('LOGIN', _loginbuttonAction),
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: GestureDetector(
+                          child: Text(
+                            'Not registered yet? register!',
+                            style: TextStyle(fontSize: 20, color: Colors.white),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              showLogin = false;
+                            });
+                          },
                         ),
-                        onTap: () {
-                          setState(() {
-                            showLogin = false;
-                          });
-                        },
                       ),
-                    ),
-                  ],
-                )
-              : Column(
-                  children: [
-                    _form('Register', _buttonAction),
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: GestureDetector(
-                        child: Text(
-                          'Already registered? Login!',
-                          style: TextStyle(fontSize: 20, color: Colors.white),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      _form('Register', _registerbuttonAction),
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: GestureDetector(
+                          child: Text(
+                            'Already registered? Login!',
+                            style: TextStyle(fontSize: 20, color: Colors.white),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              showLogin = true;
+                            });
+                          },
                         ),
-                        onTap: () {
-                          setState(() {
-                            showLogin = true;
-                          });
-                        },
-                      ),
-                    )
-                  ],
-                )),
-          _bottomWave(),
-        ],
+                      )
+                    ],
+                  )),
+            _bottomWave(),
+          ],
+        ),
       ),
     );
   }
