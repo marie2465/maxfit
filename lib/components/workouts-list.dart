@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:maxfit/domain/workout.dart';
 
-class WorkoutsList extends StatelessWidget {
+class WorkoutsList extends StatefulWidget {
+  @override
+  _WorkoutsListState createState() => _WorkoutsListState();
+}
+
+class _WorkoutsListState extends State<WorkoutsList> {
   final workouts = <Workout>[
     Workout('Test1', 'Max1', 'Test workout1', 'Beginner'),
     Workout('Test2', 'Max2', 'Test workout2', 'Intermediate'),
@@ -10,58 +15,70 @@ class WorkoutsList extends StatelessWidget {
     Workout('Test5', 'Max5', 'Test workout5', 'Intermediate'),
   ];
 
+  var filterOnlyMyWorkouts = false;
+  var filterTitle = '';
+  var filterTitleController = TextEditingController();
+  var filterLevel = 'Any Level';
+
+  var filterText = '';
+  var filterHeight = 0.0;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Container(
-        child: ListView.builder(
-            itemCount: workouts.length,
-            itemBuilder: (context, index) {
-              return Card(
-                elevation: 2.0,
-                margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(50, 65, 85, 0.9),
-                  ),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
-                    leading: Container(
-                      padding: EdgeInsets.only(right: 12.0),
-                      child: Icon(
-                        Icons.fitness_center,
-                        color: Theme.of(context).textTheme.title!.color,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            width: 1,
-                            color: Colors.white24,
-                          ),
+    var workoutContainer = Container(
+      child: ListView.builder(
+          itemCount: workouts.length,
+          itemBuilder: (context, index) {
+            return Card(
+              elevation: 2.0,
+              margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(50, 65, 85, 0.9),
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                  leading: Container(
+                    padding: EdgeInsets.only(right: 12.0),
+                    child: Icon(
+                      Icons.fitness_center,
+                      color: Theme.of(context).textTheme.title!.color,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          width: 1,
+                          color: Colors.white24,
                         ),
                       ),
                     ),
-                    title: Text(
-                      workouts[index].title,
-                      style: TextStyle(
-                          color: Theme.of(context).textTheme.title!.color,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    trailing: Icon(
-                      Icons.keyboard_arrow_right,
-                      color: Theme.of(context).textTheme.title!.color,
-                    ),
-                    subtitle: subtitle(context, workouts[index]),
                   ),
+                  title: Text(
+                    workouts[index].title,
+                    style: TextStyle(
+                        color: Theme.of(context).textTheme.title!.color,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Icon(
+                    Icons.keyboard_arrow_right,
+                    color: Theme.of(context).textTheme.title!.color,
+                  ),
+                  subtitle: subtitle(context, workouts[index]),
                 ),
-              );
-            }),
-      ),
+              ),
+            );
+          }),
+    );
+
+    return Column(
+      children: [
+        filterInfo(),
+        filterForm(),
+        workoutContainer,
+      ],
     );
   }
 }
-
-
 
 Widget subtitle(BuildContext context, Workout workout) {
   var color = Colors.grey;
